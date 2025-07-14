@@ -43,6 +43,11 @@ cd cypress
 
 - npm install
 
+- "cypress": "^12.x or 13.x"
+- Install via:
+
+- npm install --save-dev cypress
+
 - 3. Run the tests
 - Run tests in headless mode
 - npx cypress run
@@ -50,9 +55,3 @@ cd cypress
 - Run tests in interactive mode (Cypress GUI):
 
 - npx cypress open
-
-- Dependencies
-- "cypress": "^12.x or 13.x"
-- Install via:
-
-- npm install --save-dev cypress
