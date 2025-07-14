@@ -28,7 +28,7 @@ const testCases = [
   },
 ];
 
-describe('Login functionality (data-driven)', () => {
+describe('Login functionality', () => {
   beforeEach(() => {
     loginPage.visit();
   });
