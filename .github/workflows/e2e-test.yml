@@ -1,9 +1,11 @@
-name: playwright tests
+name: Playwright Tests
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 10 * * *"
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   playwright-tests:
@@ -12,68 +14,70 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4, 5, 6]
-        shardTotal: [6]
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
 
     steps:
+      # 1. Checkout repository
       - uses: actions/checkout@v4
 
+      # 2. Setup Node.js
       - uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: '20'
 
+      # 3. Install dependencies
       - name: Install dependencies
         run: npm install
-        working-directory: cypress
 
+      # 4. Install Playwright browsers
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
-        working-directory: cypress
+        run: npx playwright install --with-deps
 
+      # 5. Run Playwright tests with sharding
       - name: Run Playwright tests
-        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=list
         env:
           CI: true
-        working-directory: cypress
 
+      # 6. Upload JSON reports as artifacts
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: blob-report-${{ matrix.shardIndex }}
-          path: cypress/blob-report
-          retention-days: 1
+          name: shard-report-${{ matrix.shardIndex }}
+          path: playwright-report
+          retention-days: 7
 
   merge-reports:
-    # Merge reports after playwright-tests, even if some shards have failed
-    if: ${{ !cancelled() }}
     needs: [playwright-tests]
-
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: '20'
 
+      # 1. Install dependencies
       - name: Install dependencies
         run: npm ci
-        working-directory: cypress
 
-      - name: Download blob reports from GitHub Actions Artifacts
+      # 2. Download shard reports
+      - name: Download shard reports
         uses: actions/download-artifact@v4
         with:
-          path: cypress/all-blob-reports
-          pattern: blob-report-*
+          path: all-shard-reports
+          pattern: shard-report-*
           merge-multiple: true
 
+      # 3. Merge into HTML report
       - name: Merge into HTML Report
-        run: npx playwright merge-reports --reporter html ./all-blob-reports
-        working-directory: cypress
+        run: npx playwright merge-reports --reporter html ./all-shard-reports
 
+      # 4. Upload HTML report as artifact
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
-          name: html-report--attempt-${{ github.run_attempt }}
-          path: cypress/playwright-report
+          name: html-report
+          path: playwright-report
           retention-days: 14
