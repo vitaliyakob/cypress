@@ -11,11 +11,6 @@ jobs:
   playwright-tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shardIndex: [1, 2, 3, 4]
-        shardTotal: [4]
 
     steps:
       # 1. Checkout repository
@@ -34,50 +29,16 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # 5. Run Playwright tests with sharding
+      # 5. Run Playwright tests
       - name: Run Playwright tests
-        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=list
+        run: npx playwright test --reporter=list
         env:
           CI: true
 
-      # 6. Upload JSON reports as artifacts
+      # 6. Upload test report as artifact
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: shard-report-${{ matrix.shardIndex }}
-          path: playwright-report
-          retention-days: 7
-
-  merge-reports:
-    needs: [playwright-tests]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      # 1. Install dependencies
-      - name: Install dependencies
-        run: npm ci
-
-      # 2. Download shard reports
-      - name: Download shard reports
-        uses: actions/download-artifact@v4
-        with:
-          path: all-shard-reports
-          pattern: shard-report-*
-          merge-multiple: true
-
-      # 3. Merge into HTML report
-      - name: Merge into HTML Report
-        run: npx playwright merge-reports --reporter html ./all-shard-reports
-
-      # 4. Upload HTML report as artifact
-      - name: Upload HTML report
-        uses: actions/upload-artifact@v4
-        with:
-          name: html-report
+          name: playwright-report
           path: playwright-report
           retention-days: 14

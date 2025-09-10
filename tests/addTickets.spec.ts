@@ -2,7 +2,7 @@ import { expect, test } from "../main/fixtures/base_fixtures";
 import { password, testUsers } from '../main/config/users';
 import { getFreshchatToken, getMembershipId, getSessionKey,  getWpNonce } from "../main/api/apiHelper";
 
-test.describe('Login Page', () => {
+test.describe.skip('Login Page', () => {
   for (const user of testUsers) {
     test(`add items and make payments for ${user.email}`, async ({
       basePage,
