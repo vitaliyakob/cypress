@@ -15,6 +15,9 @@ jobs:
       contents: write
       pages: write
       id-token: write
+    strategy:
+      matrix:
+        shard: [1,2,3] 
 
     steps:
       # 1. Checkout repository
@@ -33,24 +36,21 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # 5. Run Playwright tests with reporters
+      # 5. Run Playwright tests with reporters in shard
       - name: Run Playwright tests
-        run: npx playwright test --reporter=dot,html
+        run: npx playwright test --reporter=dot,html --shard=${{ matrix.shard }}/3
         env:
           CI: true
 
-      # 6. Upload report artifact (optional, щоб скачати при потребі)
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: playwright-report-shard-${{ matrix.shard }}
           path: playwright-report
           retention-days: 14
 
-      # 7. Upload to GitHub Pages
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: playwright-report
-
