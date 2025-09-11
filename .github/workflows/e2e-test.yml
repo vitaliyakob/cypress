@@ -34,10 +34,6 @@ jobs:
           name: playwright-report-shard-1
           path: playwright-report
           retention-days: 14
-      - name: Upload Pages artifact Shard 1
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: playwright-report
 
   shard-2:
     timeout-minutes: 90
@@ -65,10 +61,6 @@ jobs:
           name: playwright-report-shard-2
           path: playwright-report
           retention-days: 14
-      - name: Upload Pages artifact Shard 2
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: playwright-report
 
   shard-3:
     timeout-minutes: 90
@@ -96,7 +88,42 @@ jobs:
           name: playwright-report-shard-3
           path: playwright-report
           retention-days: 14
-      - name: Upload Pages artifact Shard 3
+
+  merge-reports:
+    needs: [shard-1, shard-2, shard-3]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download shard 1 report
+        uses: actions/download-artifact@v3
+        with:
+          name: playwright-report-shard-1
+          path: reports/shard-1
+      - name: Download shard 2 report
+        uses: actions/download-artifact@v3
+        with:
+          name: playwright-report-shard-2
+          path: reports/shard-2
+      - name: Download shard 3 report
+        uses: actions/download-artifact@v3
+        with:
+          name: playwright-report-shard-3
+          path: reports/shard-3
+
+      - name: Merge reports
+        run: |
+          mkdir -p reports/combined
+          cp -r reports/shard-1/* reports/combined/
+          cp -r reports/shard-2/* reports/combined/
+          cp -r reports/shard-3/* reports/combined/
+
+      - name: Upload combined report to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: reports/combined
+          retention-days: 14
+
+      - name: Upload combined report to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: playwright-report
+          path: reports/combined
