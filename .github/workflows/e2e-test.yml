@@ -90,6 +90,7 @@ jobs:
           retention-days: 14
 
   merge-reports:
+    if: always() 
     needs: [shard-1, shard-2, shard-3]
     runs-on: ubuntu-latest
     steps:
