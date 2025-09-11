@@ -52,6 +52,9 @@ jobs:
           path: blob-reports
           merge-multiple: true
 
+      - name: List downloaded files
+        run: ls -R blob-reports
+
       - name: Merge into HTML Report
         run: npx playwright merge-reports --reporter html ./blob-reports
 
