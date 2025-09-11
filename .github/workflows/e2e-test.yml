@@ -29,14 +29,15 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # 5. Run Playwright tests
+      # 5. Run Playwright tests with reporters
       - name: Run Playwright tests
-        run: npx playwright test --reporter=list
+        run: npx playwright test --reporter=dot,html
         env:
           CI: true
 
-      # 6. Upload test report as artifact
-      - uses: actions/upload-artifact@v4
+      # 6. Upload Playwright HTML report as artifact
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
