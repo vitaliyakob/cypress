@@ -2,7 +2,7 @@ import BasePage from "../pages/BasePage";
 import CalendarPage from "../pages/CalendarPage";
 import DetailsPage from "../pages/DetailsPage";
 import LoginPage from "../pages/LoginPage"
-import { test as base } from '@playwright/test'
+import {test as base} from '@playwright/test'
 import MainPage from "../pages/MainPage";
 import AudubonsPage from "../pages/AudubonsPage";
 import PaymentPage from "../pages/PaymentPage";
@@ -20,69 +20,39 @@ type Fixtures = {
     paymentPage: PaymentPage;
     receiptPage: ReceiptPage;
     membershipPage: MembershipPage;
-    familyPage: FamilyPage;
-}
+    familyPage: FamilyPage
+};
 
 export const test = base.extend<Fixtures>({
-    loginPage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    loginPage: async ({page}, use) => {
         await use(new LoginPage(page));
-        await context.close();
     },
-    basePage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    basePage: async ({page}, use) => {
         await use(new BasePage(page));
-        await context.close();
     },
-    mainPage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    mainPage: async ({page}, use) => {
         await use(new MainPage(page));
-        await context.close();
     },
-    detailsPage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    detailsPage: async ({page}, use) => {
         await use(new DetailsPage(page));
-        await context.close();
     },
-    calendarPage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    calendarPage: async ({page}, use) => {
         await use(new CalendarPage(page));
-        await context.close();
     },
-    paymentPage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    paymentPage: async ({page}, use) => {
         await use(new PaymentPage(page));
-        await context.close();
     },
-    audubonPage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    audubonPage: async ({page}, use) => {
         await use(new AudubonsPage(page));
-        await context.close();
     },
-    receiptPage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    receiptPage: async ({page}, use) => {
         await use(new ReceiptPage(page));
-        await context.close();
     },
-    membershipPage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    membershipPage: async ({page}, use) => {
         await use(new MembershipPage(page));
-        await context.close();
     },
-    familyPage: async ({ browser }, use) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
+    familyPage: async ({page}, use) => {
         await use(new FamilyPage(page));
-        await context.close();
     },
 })
 
