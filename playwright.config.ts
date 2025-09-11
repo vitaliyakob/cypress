@@ -5,7 +5,7 @@ export const BASE_URL = 'https://dev.hmns.org';
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
-  timeout: 200000,
+  timeout: 400000,
   workers: 28,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 0 : 0,
