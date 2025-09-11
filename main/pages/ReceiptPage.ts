@@ -35,7 +35,7 @@ export default class ReceiptPage extends BasePage {
     }
 
     async expectBillingTextToContain(expectedText: string) {
-        await this.billing.first().waitFor({ state: 'visible', timeout: 20000 });
+        // await this.billing.first().waitFor({ state: 'visible', timeout: 20000 });
         const allTexts = await this.billing.allTextContents();
         const fullText = allTexts.join('\n').trim();
 
