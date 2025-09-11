@@ -20,20 +20,17 @@ jobs:
           node-version: lts/*
       - name: Install dependencies
         run: npm install
-        working-directory: ./cypress
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
-        working-directory: ./cypress
       - name: Run Playwright tests
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
         env:
           CI: true
-        working-directory: ./cypress
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: blob-report-${{ matrix.shardIndex }}
-          path: cypress/blob-report
+          path: blob-report
           retention-days: 1
 
   merge-reports:
@@ -47,22 +44,20 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm ci
-        working-directory: ./cypress
 
       - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: cypress/all-blob-reports
+          path: all-blob-reports
           pattern: blob-report-*
           merge-multiple: true
 
       - name: Merge into HTML Report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
-        working-directory: ./cypress
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: html-report--attempt-${{ github.run_attempt }}
-          path: cypress/playwright-report
+          path: playwright-report
           retention-days: 14
