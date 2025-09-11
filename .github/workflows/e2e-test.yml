@@ -2,80 +2,129 @@ name: Playwright Tests
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 10 * * *"
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
-  playwright-tests:
+  shard-1:
     timeout-minutes: 90
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shardIndex: [1,2,3]
-        shardTotal: [3]
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install dependencies
-        run: npm ci
-        working-directory: cypress
-
-      - name: Install Playwright Browsers
+        run: npm install
+      - name: Install Playwright browsers
         run: npx playwright install --with-deps
-        working-directory: cypress
-
-      - name: Run Playwright shard
-        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=dot,html
+      - name: Run Shard 1
+        run: npx playwright test --reporter=dot,html --shard=1/3
         env:
           CI: true
-        working-directory: cypress
-
-      - name: Upload shard report
+      - name: Upload Playwright report Shard 1
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-shard-${{ matrix.shardIndex }}
+          name: playwright-report-shard-1
+          path: playwright-report
+          retention-days: 14
+
+  shard-2:
+    timeout-minutes: 90
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run Shard 2
+        run: npx playwright test --reporter=dot,html --shard=2/3
+        env:
+          CI: true
+      - name: Upload Playwright report Shard 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-shard-2
+          path: playwright-report
+          retention-days: 14
+
+  shard-3:
+    timeout-minutes: 90
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run Shard 3
+        run: npx playwright test --reporter=dot,html --shard=3/3
+        env:
+          CI: true
+      - name: Upload Playwright report Shard 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-shard-3
           path: playwright-report
           retention-days: 14
 
   merge-reports:
-    if: always()
-    needs: [playwright-tests]
+    if: always() 
+    needs: [shard-1, shard-2, shard-3]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: e2e
-
-      - name: Download all shard reports
+      - name: Download shard 1 report
         uses: actions/download-artifact@v4
         with:
-          path: all-shard-reports
-          pattern: playwright-report-shard-*
-          merge-multiple: true
+          name: playwright-report-shard-1
+          path: reports/shard-1
+      - name: Download shard 2 report
+        uses: actions/download-artifact@4
+        with:
+          name: playwright-report-shard-2
+          path: reports/shard-2
+      - name: Download shard 3 report
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report-shard-3
+          path: reports/shard-3
 
-      - name: Merge into HTML Report
-        run: npx playwright show-report --output playwright-report ./all-shard-reports
-        working-directory: cypress
+      - name: Merge reports
+        run: |
+          mkdir -p reports/combined
+          cp -r reports/shard-1/* reports/combined/
+          cp -r reports/shard-2/* reports/combined/
+          cp -r reports/shard-3/* reports/combined/
 
-      - name: Upload merged HTML report
+      - name: Upload combined report to artifact
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-html-report
-          path: playwright-report
+          name: playwright-report
+          path: reports/combined
           retention-days: 14
 
-      - name: Upload merged report to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload combined report to GitHub Pages
+        uses: actions/upload-pages-artifact@v4
         with:
-          path: playwright-report
+          path: reports/combined
