@@ -17,8 +17,8 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    video: 'on',
+    screenshot: 'on',          // тепер скріншоти завжди створюються
+    video: 'on',               // тепер відео завжди створюється
     headless: true,
     viewport: { width: 1380, height: 720 },
     launchOptions: {
