@@ -1,5 +1,4 @@
-name: Playwright Tests
-
+name: playwright tests
 on:
   workflow_dispatch:
   schedule:
@@ -7,102 +6,59 @@ on:
 
 jobs:
   playwright-tests:
-    timeout-minutes: 90
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4]
+        shardIndex: [1, 2, 3, 4, 5, 6]
+        shardTotal: [6]
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-
       - name: Install dependencies
-        run: npm ci
-
+        run: npm install
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
-
       - name: Run Playwright tests
-        run: |
-          echo "Running shard ${{ matrix.shardIndex }}/4"
-          npx playwright test \
-            --shard="${{ matrix.shardIndex }}/4" \
-            --output=blob-report
+        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
         env:
           CI: true
-
-      - name: Upload shard blob report
-        uses: actions/upload-artifact@v4
+          USER_NAME: ${{ secrets.USER_NAME }}
+          USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
+          AOI_KEY: ${{ secrets.AOI_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
         with:
-          name: shard-${{ matrix.shardIndex }}
+          name: blob-report-${{ matrix.shardIndex }}
           path: blob-report
-          retention-days: 7
+          retention-days: 1
 
   merge-reports:
+    # Merge reports after playwright-tests, even if some shards have failed
     if: ${{ !cancelled() }}
     needs: [playwright-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-
       - name: Install dependencies
         run: npm ci
-
-      - name: Download shard blob reports
+      - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: shard-*
-          path: blob-reports
-
-      - name: Merge shard reports into one folder
-        run: |
-          mkdir -p merged-reports
-          for shard in blob-reports/shard-*; do
-            if [ -d "$shard" ]; then
-              cp -r "$shard"/* merged-reports/
-            fi
-          done
-
-      - name: Merge into HTML report
-        run: |
-          if [ -d "./merged-reports" ] && [ "$(ls -A ./merged-reports)" ]; then
-            npx playwright merge-reports --reporter html ./merged-reports
-          else
-            echo "No shard reports found, skipping merge"
-          fi
-
-      - name: Collect all videos
-        id: collect_videos
-        run: |
-          mkdir -p all-videos
-          if compgen -G "merged-reports/**/*.webm" > /dev/null; then
-            find merged-reports -name '*.webm' -exec cp {} all-videos/ \;
-            echo "Videos collected."
-            echo "found=true" >> $GITHUB_OUTPUT
-          else
-            echo "No videos found to collect."
-            echo "found=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Upload merged HTML report
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+      - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 14
-
-      - name: Upload all shard videos
-        if: ${{ steps.collect_videos.outputs.found == 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: all-videos
-          path: all-videos
-          retention-days: 7
