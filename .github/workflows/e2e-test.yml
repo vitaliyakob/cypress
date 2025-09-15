@@ -1,5 +1,4 @@
-name: Playwright Tests
-
+name: playwright tests
 on:
   workflow_dispatch:
   schedule:
@@ -7,7 +6,7 @@ on:
 
 jobs:
   playwright-tests:
-    timeout-minutes: 90
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -16,43 +15,23 @@ jobs:
         shardTotal: [6]
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-
       - name: Install dependencies
         run: npm install
-
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
-
       - name: Run Playwright tests
-        run: npx playwright test \
-          --reporter=blob \
-          --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} \
-          --output=blob-report
+        run: npx playwright test --reporter blob --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --output=blob-report
         env:
           CI: true
-
-      - name: List generated reports
-        run: ls -R blob-report
-
-      - name: Upload shard blob report
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: blob-report-${{ matrix.shardIndex }}
           path: blob-report
-          retention-days: 7
-
-      - name: Upload videos, screenshots, traces
-        uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: artifacts-${{ matrix.shardIndex }}
-          path: blob-report/**/*.{webm,png,zip}
-          retention-days: 7
+          retention-days: 1
 
   merge-reports:
     if: ${{ !cancelled() }}
@@ -60,15 +39,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: lts/*
-
+          node-version: 20
       - name: Install dependencies
         run: npm ci
 
-      - name: Download shard blob reports
+      - name: Download blob reports
         uses: actions/download-artifact@v4
         with:
           pattern: blob-report-*
@@ -78,13 +55,8 @@ jobs:
       - name: List downloaded files
         run: ls -R blob-reports
 
-      - name: Merge into HTML report
-        run: |
-          if [ -d "./blob-reports" ] && [ "$(ls -A ./blob-reports)" ]; then
-            npx playwright merge-reports --reporter html ./blob-reports
-          else
-            echo "No shard reports found, skipping merge"
-          fi
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter html ./blob-reports
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
