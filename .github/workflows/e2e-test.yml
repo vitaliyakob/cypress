@@ -28,10 +28,10 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
-        run: npx playwright test \
-          --reporter=blob \
-          --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} \
-          --output=blob-report
+        run: |
+          npx playwright test \
+            --shard="${{ matrix.shardIndex }}/${{ matrix.shardTotal }}" \
+            --output=blob-report
         env:
           CI: true
 
