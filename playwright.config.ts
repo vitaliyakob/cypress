@@ -18,7 +18,7 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'on',
     headless: true,
     viewport: { width: 1380, height: 720 },
     launchOptions: {

@@ -84,9 +84,17 @@ jobs:
           fi
 
       - name: Collect all videos
+        id: collect_videos
         run: |
           mkdir -p all-videos
-          find blob-reports -name '*.webm' -exec cp {} all-videos/ \;
+          if compgen -G "blob-reports/**/*.webm" > /dev/null; then
+            find blob-reports -name '*.webm' -exec cp {} all-videos/ \;
+            echo "Videos collected."
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "No videos found to collect."
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Upload merged HTML report
         uses: actions/upload-artifact@v4
@@ -96,6 +104,7 @@ jobs:
           retention-days: 14
 
       - name: Upload all shard videos
+        if: ${{ steps.collect_videos.outputs.found == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: all-videos
