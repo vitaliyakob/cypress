@@ -35,22 +35,10 @@ jobs:
         env:
           CI: true
 
-      - name: List generated reports
-        run: ls -R blob-report || echo "No reports found"
-
       - name: Upload shard blob report
         uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
         with:
-          name: blob-report-${{ matrix.shardIndex }}
-          path: blob-report
-          retention-days: 7
-
-      - name: Upload videos, screenshots, traces
-        uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: artifacts-${{ matrix.shardIndex }}
+          name: shard-${{ matrix.shardIndex }}
           path: blob-report
           retention-days: 7
 
@@ -71,14 +59,22 @@ jobs:
       - name: Download shard blob reports
         uses: actions/download-artifact@v4
         with:
-          pattern: blob-report-*
+          pattern: shard-*
           path: blob-reports
-          merge-multiple: true
+
+      - name: Merge shard reports into one folder
+        run: |
+          mkdir -p merged-reports
+          for shard in blob-reports/shard-*; do
+            if [ -d "$shard" ]; then
+              cp -r "$shard"/* merged-reports/
+            fi
+          done
 
       - name: Merge into HTML report
         run: |
-          if [ -d "./blob-reports" ] && [ "$(ls -A ./blob-reports)" ]; then
-            npx playwright merge-reports --reporter html ./blob-reports
+          if [ -d "./merged-reports" ] && [ "$(ls -A ./merged-reports)" ]; then
+            npx playwright merge-reports --reporter html ./merged-reports
           else
             echo "No shard reports found, skipping merge"
           fi
@@ -87,8 +83,8 @@ jobs:
         id: collect_videos
         run: |
           mkdir -p all-videos
-          if compgen -G "blob-reports/**/*.webm" > /dev/null; then
-            find blob-reports -name '*.webm' -exec cp {} all-videos/ \;
+          if compgen -G "merged-reports/**/*.webm" > /dev/null; then
+            find merged-reports -name '*.webm' -exec cp {} all-videos/ \;
             echo "Videos collected."
             echo "found=true" >> $GITHUB_OUTPUT
           else
