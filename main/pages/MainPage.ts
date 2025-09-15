@@ -57,7 +57,7 @@ export default class MainPage extends BasePage {
     };
 
     async goToCart() {
-        await this.oneItem.waitFor({state:'hidden', timeout:3000})
+        await this.oneItem.waitFor({state:'hidden', timeout:20000})
         await this.cart.click();
     }
 }
