@@ -11,7 +11,8 @@ export default defineConfig({
   retries: process.env.CI ? 0 : 0,
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'playwright-report', open: 'never' }]
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['blob', { outputFolder: 'blob-report' }]
   ],
   use: {
     baseURL: BASE_URL,
@@ -37,4 +38,3 @@ export default defineConfig({
     },
   ],
 });
-
