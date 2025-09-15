@@ -17,8 +17,8 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     trace: 'retain-on-failure',
-    screenshot: 'on',          // тепер скріншоти завжди створюються
-    video: 'on',               // тепер відео завжди створюється
+    screenshot: 'on',
+    video: 'on',
     headless: true,
     viewport: { width: 1380, height: 720 },
     launchOptions: {
@@ -32,9 +32,9 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'edge',
-      use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    },
+    // {
+    //   name: 'edge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    // },
   ],
 });
