@@ -12,8 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4, 5, 6]
-        shardTotal: [6]
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
     steps:
       - uses: actions/checkout@v4
 
@@ -75,9 +75,6 @@ jobs:
           path: blob-reports
           merge-multiple: true
 
-      - name: List downloaded files
-        run: ls -R blob-reports
-
       - name: Merge into HTML report
         run: |
           if [ -d "./blob-reports" ] && [ "$(ls -A ./blob-reports)" ]; then
@@ -86,9 +83,21 @@ jobs:
             echo "No shard reports found, skipping merge"
           fi
 
-      - name: Upload HTML report
+      - name: Collect all videos
+        run: |
+          mkdir -p all-videos
+          find blob-reports -name '*.webm' -exec cp {} all-videos/ \;
+
+      - name: Upload merged HTML report
         uses: actions/upload-artifact@v4
         with:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 14
+
+      - name: Upload all shard videos
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-videos
+          path: all-videos
+          retention-days: 7
