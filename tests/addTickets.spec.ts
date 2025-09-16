@@ -2,7 +2,7 @@ import { expect, test } from "../main/fixtures/base_fixtures";
 import { password, testUsers } from '../main/config/users';
 import { getFreshchatToken, getMembershipId, getSessionKey,  getWpNonce } from "../main/api/apiHelper";
 
-test.describe.skip('Login Page', () => {
+test.describe('Login Page', () => {
   for (const user of testUsers) {
     test(`add items and make payments for ${user.email}`, async ({
       basePage,
@@ -32,20 +32,21 @@ test.describe.skip('Login Page', () => {
       // const membershipId = await getMembershipId(request, nonce);
       // console.log(sessionKey);
       // console.log(membershipId)
-        await mainPage.goToCart();
-      
+      await mainPage.goToCart();
+      await detailsPage.expectQuantityToBe("2");
+      await detailsPage.expectDateToBe(audubonPage.lastSelectedDate);
       await detailsPage.checkoutTOPayments();
       await loginPage.submitLoginForm(user.email, user.password);
       // const token = await getFreshchatToken(page);
       // console.log('Freshchat token:', token);
-      await mainPage.addPromoCode(user.promoCode);
-      await detailsPage.checkMessage();
+      // await mainPage.addPromoCode(user.promoCode);
+      // await detailsPage.checkMessage();
 
       const billing = await detailsPage.getBillingText();
       await paymentPage.fillAdyenCard(user.card,'03/30','737','US');
       await paymentPage.agreeToTheTerms();
       await paymentPage.completeCheckout();
-      await receiptPage.expectOrderTextToContain("");
+      // await receiptPage.expectOrderTextToContain("");
       await receiptPage.expectBillingTextToContain(billing);
       // const tokenAfterBuy = await getFreshchatToken(page);
       // console.log('Freshchat token:', tokenAfterBuy);

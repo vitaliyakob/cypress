@@ -24,7 +24,6 @@ for (let i = 0; i < testUsers.length; i += USERS_PER_BLOCK) {
       }, testInfo) => {
         console.log(`Running test with user: ${user.email}`);
 
-        // Ізольована сесія для кожного користувача
         await basePage.navigateToURL();
         await basePage.loginToApplication(password);
 

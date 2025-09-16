@@ -10,6 +10,7 @@ export default class AudubonsPage extends BasePage {
     readonly timeDropdown: Locator;
     readonly cart: Locator;
     readonly oneItem: Locator;
+    public lastSelectedDate: string;
     
 
     constructor(public page: Page) {
@@ -24,45 +25,54 @@ export default class AudubonsPage extends BasePage {
         this.cart = page.locator('[class="hmns-tessitura-bar"] [class="tessitura-cell cart"]')
     }
 
-   dateFromToday(offsetDays: number = 2): Locator {
-    const today = new Date();
-    today.setDate(today.getDate() + offsetDays);
-    const day = today.getDate();
-    return this.page.locator(`//li[@data-access='allowed' and contains(text(),'${day}')]`);
+   dateFromNextDays(maxOffsetDays: number = 10): Locator {
+    const offsetDays = Math.floor(Math.random() * maxOffsetDays) + 1;
+
+    const date = new Date();
+    date.setDate(date.getDate() + offsetDays);
+
+    const fullMonth = date.toLocaleDateString('en-US', { month: 'long' });
+    const day = date.getDate();
+    const year = date.getFullYear();
+    this.lastSelectedDate = `${fullMonth} ${day}, ${year}`;
+
+    const shortMonth = date.toLocaleDateString('en-US', { month: 'short' });
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+    const formattedDate = `${weekday}, ${shortMonth} ${day} ${year}`;
+
+    return this.page.locator('.perfDropDownMenu').getByText(formattedDate, { exact: true });
 }
 
-   timeFromISO(isoString: string, offsetHours: number = 3): Locator {
-    const date = new Date(isoString);
-    date.setHours(date.getHours() + offsetHours);
+    timeFromISO(isoString: string, offsetHours: number = 3): Locator {
+        const date = new Date(isoString);
+        date.setHours(date.getHours() + offsetHours);
 
-    // Округляємо хвилини вниз до кратного 15
-    const minutes = Math.floor(date.getMinutes() / 15) * 15;
-    date.setMinutes(minutes, 0, 0);
+        const minutes = Math.floor(date.getMinutes() / 15) * 15;
+        date.setMinutes(minutes, 0, 0);
 
-    // Форматуємо у 12-годинний формат з AM/PM
-    const hours12 = date.getHours() % 12 || 12;
-    const minutesStr = date.getMinutes().toString().padStart(2, '0');
-    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
-    const timeText = `${hours12}:${minutesStr} ${ampm}`;
+        const hours12 = date.getHours() % 12 || 12;
+        const minutesStr = date.getMinutes().toString().padStart(2, '0');
+        const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+        const timeText = `${hours12}:${minutesStr} ${ampm}`;
 
-    // Шукаємо li всередині timeDropdown і тільки видимий
-    return this.page.locator('[class="zone-id"]', { hasText: `${timeText}`}).nth(0);
-}
+        return this.page.locator('[class="zone-id"]', { hasText: `${timeText}`}).nth(0);
+    }
 
-async selectDateandTime() {
-    await this.selectDay.click();
-    const day = this.dateFromToday();
-    await day.click();
-   
-    await this.availableTimes.click();
+    async selectDateandTime() {
+        await this.selectDay.waitFor({state:'visible'})
+        await this.selectDay.click({ timeout: 5000 });
+        const day = this.dateFromNextDays();
+        await day.waitFor({state:'visible'})
+        await day.click({ timeout: 5000 });
+    
+        await this.availableTimes.click();
 
-    const now = new Date();
-    const time = this.timeFromISO(now.toISOString(), 1);
+        const now = new Date();
+        const time = this.timeFromISO(now.toISOString(), 1);
 
-    // await this.timeDropdown.waitFor({ state: 'visible', timeout: 4000 });
-await time.waitFor({ state: 'visible', timeout: 10000 });
-    await time.click({ timeout: 10000 });
-}
+        await time.waitFor({ state: 'visible', timeout: 10000 });
+        await time.click({ timeout: 10000 });
+    }
 
     async checkTitle() {
         await this.title.waitFor({state:'visible', timeout:10000});

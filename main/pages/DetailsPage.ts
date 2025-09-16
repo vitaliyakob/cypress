@@ -7,6 +7,9 @@ export default class DetailsPage extends BasePage {
     readonly promoApply: Locator;
     readonly billing: Locator;
     readonly checkCartItem: Locator;
+    readonly quantity: Locator;
+    readonly selectedDate: Locator;
+    
 
     constructor(public page: Page) {
         super(page);
@@ -14,12 +17,27 @@ export default class DetailsPage extends BasePage {
         this.checkout = page.locator('[class*="cart-buttons__primary"]');
         this.promoApply = page.locator('[class*="cart__promo-applied"]');
         this.billing = page.locator('[class="tn-patron-billing-information"]>div>div:nth-child(2)');
-        this.checkCartItem = page.locator('[class="tn-cart-line-item-name"]')
+        this.checkCartItem = page.locator('[class="tn-cart-line-item-name"]');
+        this.quantity = page.locator('[class*="item--quantity"]');
+        this.selectedDate = page.locator('[class*="property--date-time"]')
+        
     }
 
     async checkoutTOPayments(): Promise<void> {
         await this.detailsPage.waitFor({state:'visible', timeout:10000})
         await this.checkout.click()
+    };
+
+    async expectQuantityToBe(value: string) {
+        await this.detailsPage.waitFor({state:'visible', timeout:10000})
+        await expect(this.quantity).toContainText(value);
+    };
+
+    async expectDateToBe(value: string) {
+        const escapedDate = value.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(escapedDate);
+
+        await expect(this.selectedDate).toContainText(regex, { timeout: 10000 });
     };
 
    async checkNameOfTheAddedItem(membership: string) {
