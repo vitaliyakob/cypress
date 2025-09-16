@@ -1,8 +1,7 @@
 import { Locator, Page } from '@playwright/test';
 import BasePage from './BasePage';
-import AudubonsPage from './AudubonsPage';
 
-export default class MainPage extends AudubonsPage {
+export default class MainPage extends BasePage {
     readonly promoCode: Locator;
     readonly calendar: Locator;
     readonly exhibits: Locator;
@@ -58,14 +57,7 @@ export default class MainPage extends AudubonsPage {
     };
 
     async goToCart() {
-    try {
-        await this.oneItem.waitFor({ state: 'hidden', timeout: 20000 });
-    } catch (error) {
-        console.warn('oneItem still visible');
-        await this.add.click()
-        await this.oneItem.waitFor({ state: 'hidden', timeout: 20000 });
-    }
+        await this.oneItem.waitFor({state:'hidden', timeout:30000})
         await this.cart.click();
     }
-    
 }
