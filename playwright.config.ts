@@ -20,7 +20,7 @@ export default defineConfig({
     screenshot: 'on',
     video: 'on',
     headless: true,
-    viewport: { width: 1380, height: 720 },
+    viewport: { width: 1920, height: 1080 },
     launchOptions: {
       args: ['--window-size=1920,1080'],
     },
