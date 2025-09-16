@@ -27,13 +27,13 @@ test.describe('Login Page', () => {
       await audubonPage.chooseNumberOfTickets(2);
       await audubonPage.clickAddToCart()
       await mainPage.sessionTime.waitFor({state:'visible', timeout:10000})
-      //  const nonce = await getWpNonce(page);
+      await mainPage.goToCart();
+      await detailsPage.expectQuantityToBe("2");
+      //   const nonce = await getWpNonce(page);
       // const sessionKey = await getSessionKey(request, nonce);
       // const membershipId = await getMembershipId(request, nonce);
       // console.log(sessionKey);
       // console.log(membershipId)
-      await mainPage.goToCart();
-      await detailsPage.expectQuantityToBe("2");
       await detailsPage.expectDateToBe(audubonPage.lastSelectedDate);
       await detailsPage.checkoutTOPayments();
       await loginPage.submitLoginForm(user.email, user.password);
