@@ -94,6 +94,7 @@ export default class AudubonsPage extends BasePage {
         await Promise.all([...Array(count).keys()].map(i =>
             expect(spinners.nth(i)).toBeHidden({ timeout: 5000 })
         ));
+        await this.page.waitForTimeout(6000)
         await this.add.click();
     }
 
