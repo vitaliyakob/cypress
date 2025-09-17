@@ -24,7 +24,7 @@ export default class AudubonsPage extends BasePage {
         this.timeDropdown = page.locator('[class="zone-id"]');
         this.oneItem = page.locator('[aria-label="Cart, 0 items"]')
         this.cart = page.locator('[class="hmns-tessitura-bar"] [class="tessitura-cell cart"]');
-        this.spinner = page.locator('[class="logged-spinner spinner"]')
+        this.spinner = page.locator('[class="hmns-tessitura-bar"] [class="logged-out"]')
     }
 
    dateFromNextDays(maxOffsetDays: number = 10): Locator {
@@ -89,12 +89,7 @@ export default class AudubonsPage extends BasePage {
     };
 
     async clickAddToCart() {
-        const spinners = this.spinner
-        const count = await spinners.count();
-        await Promise.all([...Array(count).keys()].map(i =>
-            expect(spinners.nth(i)).toBeHidden({ timeout: 5000 })
-        ));
-        await this.page.waitForTimeout(6000)
+        await this.spinner.waitFor({state:"visible", timeout:10000})
         await this.add.click();
     }
 
