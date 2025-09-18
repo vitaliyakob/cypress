@@ -6,18 +6,19 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   timeout: 400000,
-  workers: 1,
+  workers: 14,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 0 : 0,
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['blob', { outputFolder: 'blob-report',  retentionDays: 1 }]
   ],
   use: {
     baseURL: BASE_URL,
     trace: 'retain-on-failure',
-    screenshot: 'on',
-    video: 'on',                      
+    screenshot: 'only-on-failure',
+    video: 'on',
     headless: true,
     viewport: { width: 1920, height: 1080 },
     launchOptions: {
@@ -29,11 +30,11 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { 
-        ...devices['Desktop Chrome'],
-        video: 'on',
-        screenshot: 'on',
-      },
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'edge',
+      use: { ...devices['Desktop Edge'], channel: 'msedge' },
     },
   ],
 });
