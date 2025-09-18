@@ -29,7 +29,8 @@ test.describe('Login Page', () => {
       await audubonPage.clickAddToCart()
       await mainPage.sessionTime.waitFor({state:'visible', timeout:10000})
       await mainPage.goToCart();
-      await detailsPage.expectQuantityToBe("2");
+      const str1 = randomNumber.toString();
+      await detailsPage.expectQuantityToBe(str1);
       //   const nonce = await getWpNonce(page);
       // const sessionKey = await getSessionKey(request, nonce);
       // const membershipId = await getMembershipId(request, nonce);
