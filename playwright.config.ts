@@ -12,7 +12,7 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
-    ['blob', { outputFolder: 'blob-report' }]
+    ['blob', { outputFolder: 'blob-report',  retentionDays: 1 }]
   ],
   use: {
     baseURL: BASE_URL,
