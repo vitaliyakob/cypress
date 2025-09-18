@@ -89,7 +89,8 @@ export default class AudubonsPage extends BasePage {
     };
 
     async clickAddToCart() {
-        await this.spinner.waitFor({state:"visible", timeout:10000})
+        await this.spinner.waitFor({state:"visible", timeout:20000})
+        await this.page.waitForTimeout(5000)
         await this.add.click();
     }
 
