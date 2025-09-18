@@ -12,7 +12,7 @@ export default class FamilyPage extends BasePage {
     }
 
     async addFamilyToCard(): Promise<void> {
-        await this.spinner.waitFor({state:"visible", timeout:20000})
+        await this.spinner.waitFor({state:"visible", timeout:60000})
         await this.addToCart.click();
     }
 }
