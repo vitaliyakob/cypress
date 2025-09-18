@@ -35,6 +35,13 @@ jobs:
           name: blob-report-${{ matrix.shardIndex }}
           path: blob-report
           retention-days: 1
+      - name: Upload videos
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos-${{ matrix.shardIndex }}
+          path: test-results/**/*.webm
+          retention-days: 7
 
   # merge-reports:
   #   # Merge reports after playwright-tests, even if some shards have failed
