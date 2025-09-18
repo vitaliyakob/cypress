@@ -24,7 +24,8 @@ test.describe('Login Page', () => {
       await calendarPage.selectAudubonsTicket();
       // await audubonPage.checkTitle();
       await audubonPage.selectDateandTime();
-      await audubonPage.chooseNumberOfTickets(2);
+      const randomNumber = Math.floor(Math.random() * 10) + 1;
+      await audubonPage.chooseNumberOfTickets(randomNumber);
       await audubonPage.clickAddToCart()
       await mainPage.sessionTime.waitFor({state:'visible', timeout:10000})
       await mainPage.goToCart();

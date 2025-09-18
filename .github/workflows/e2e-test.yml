@@ -34,7 +34,7 @@ jobs:
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
           AOI_KEY: ${{ secrets.AOI_KEY }}
 
-      - name: Copy Playwright videos and reports
+      - name: Copy Playwright videos and reports for this shard
         run: |
           mkdir -p blob-report
           cp -r test-results/* blob-report/
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: blob-report-${{ matrix.shardIndex }}
+          name: blob-report-shard-${{ matrix.shardIndex }}
           path: blob-report
           retention-days: 1
 

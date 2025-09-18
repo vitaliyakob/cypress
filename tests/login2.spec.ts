@@ -27,7 +27,7 @@ for (let i = 0; i < testUsers.length; i += USERS_PER_BLOCK) {
         await basePage.navigateToURL();
         await basePage.loginToApplication(password);
 
-        await mainPage.addPromoCode("ANNUAL15");
+        await mainPage.addPromoCode(user.promoCode);
         await mainPage.navigateToMembershipsLevel();
         await membershipPage.clickMembership(user.productName);
         await familyPage.addFamilyToCard();
