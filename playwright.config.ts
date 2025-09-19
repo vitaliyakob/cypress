@@ -6,7 +6,7 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   timeout: 400000,
-  workers: 28,
+  workers: 56,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 0 : 0,
   reporter: [
@@ -32,9 +32,9 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    // {
-    //   name: 'edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
+    {
+      name: 'edge',
+      use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    },
   ],
 });
