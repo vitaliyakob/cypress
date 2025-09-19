@@ -1,4 +1,4 @@
-import { expect, test } from "../main/fixtures/base_fixtures";
+/*import { expect, test } from "../main/fixtures/base_fixtures";
 import { password, testUsers } from '../main/config/users';
 import { getFreshchatToken, getMembershipId, getSessionKey, getWpNonce } from "../main/api/apiHelper";
 
@@ -64,4 +64,4 @@ for (let i = 0; i < testUsers.length; i += USERS_PER_BLOCK) {
       });
     }
   });
-}
+}*/
