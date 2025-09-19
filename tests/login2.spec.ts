@@ -2,7 +2,7 @@ import { expect, test } from "../main/fixtures/base_fixtures";
 import { password, testUsers } from '../main/config/users';
 import { getFreshchatToken, getMembershipId, getSessionKey, getWpNonce } from "../main/api/apiHelper";
 
-const USERS_PER_BLOCK = 10; 
+const USERS_PER_BLOCK = 3; 
 
 
 for (let i = 0; i < testUsers.length; i += USERS_PER_BLOCK) {
