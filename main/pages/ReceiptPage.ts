@@ -10,6 +10,7 @@ export default class ReceiptPage extends BasePage {
     readonly name: Locator;
     readonly productName: Locator;
     readonly listItem: Locator;
+    readonly thankYou: Locator;
 
     constructor(public page: Page) {
         super(page);
@@ -20,6 +21,7 @@ export default class ReceiptPage extends BasePage {
         this.name = page.locator('[class*="item-name"]');
         this.productName = page.locator('[class*="tn-product-type-name"]');
         this.listItem = page.locator('[class*="performance-detail"] [class*="list-item--pricetype"]');
+        this.thankYou = page.locator('#tn-page-heading')
     }
 
     async orderIsCompleted(): Promise<void> {
@@ -35,7 +37,7 @@ export default class ReceiptPage extends BasePage {
     }
 
     async expectBillingTextToContain(expectedText: string) {
-        await this.billing.first().waitFor({ state: 'visible', timeout: 20000 });
+        await this.thankYou.waitFor({ state: 'visible', timeout: 20000 });
         const allTexts = await this.billing.allTextContents();
         const fullText = allTexts.join('\n').trim();
 
