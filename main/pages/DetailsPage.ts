@@ -25,7 +25,8 @@ export default class DetailsPage extends BasePage {
 
     async checkoutTOPayments(): Promise<void> {
         await this.detailsPage.waitFor({state:'visible', timeout:10000})
-        await this.checkout.click()
+        await this.checkout.click();
+        await this.page.waitForTimeout(30000)
     };
 
     async expectQuantityToBe(value: string) {
