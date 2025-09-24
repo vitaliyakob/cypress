@@ -59,5 +59,7 @@ export default class MainPage extends BasePage {
     async goToCart() {
         await this.oneItem.waitFor({state:'hidden', timeout:30000})
         await this.cart.click();
+        const cartUrl = this.page.url();
+        console.log(`Current cart URL for: ${cartUrl}`);
     }
 }
